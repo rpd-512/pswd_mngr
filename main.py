@@ -33,6 +33,7 @@ def startup():
                 exit()
             else:
                 os.system(clrScr)
+                print("Type \"\\h\" for help, \"\\a\" for about")
                 break
     else:
         print("\nWelcome to your very own password manager!!")
@@ -44,7 +45,7 @@ def startup():
                 print("\n!!Cancelled!!")
                 exit()
             if(mst_pswd == rem_pswd):
-                os.system("mkdir "+dbPath)
+                os.mkdir(dbPath)
                 conn = sqlite3.connect(dbPath+".pswds.db")
                 conn.execute("create table app_det (pswd text);")
                 conn.execute("""create table pwd_det (
@@ -290,16 +291,36 @@ def cpy(txt):
         elif(tocopy == 'pswd'):
             cp = pswd
         copy(cp)
-        print(tocopy+" copied to clipboard")
+        print(tocopy+" copied to clip board")
     else:
         print("No data found regarding Entry ID "+id+". Try using see command to check for available Entry ID's.")
+def reset():
+    global acc_pswd, dbPath
+    print("WARNING!! YOU WON'T BE ABLE TO RECOVER ANY PASSWORD AFTER YOU RESET!!")
+    try:
+        mst_pswd = hidepass.getpass(prompt="Type master password for confirmation (press ctrl-c to cancel): ")
+    except(KeyboardInterrupt):
+        print("\n!!Cancelled!!")
+        return 0
+    hash_pswd = (hashlib.md5((mst_pswd+"314159265358979323846264338327").encode())).hexdigest()
+    if(hash_pswd != acc_pswd):
+        print("!! Wrong password !!")
+        return 0
+    os.remove(dbPath+'.pswds.db')
+    try:
+        os.rmdir(dbPath)
+    except:
+        pass
+    print("!!DELETED!!")
+    sleep(3)
+    os.system("clear")
+    exit()
 startup()
 try:
     conn.close()
 except:
     pass
 conn = sqlite3.connect(dbPath+".pswds.db")
-print("Type \"\\h\" for help, \"\\a\" for about")
 while(True):
     try:
         inp = input("password_manager:~$ ")
@@ -323,12 +344,13 @@ while(True):
             -> updt  - updates an entry. use it as follows:
                         (O) updt <entry id>
                        get entry id via `see` command
-            -> copy  - copies related data accourding to Entry ID. try the following:
+            -> copy  - copies related data according to Entry ID. try the following:
                         (O) copy site <entry id>
                         (O) copy mail <entry id>
                         (O) copy name <entry id>
                         (O) copy pswd <entry id>
                        get entry id via `see` command
+            -> reset - deletes all the data and resets everything.
             -> \\h    - help
             -> \\a    - about\n""")
         elif(inp == "\\a"):
@@ -377,6 +399,8 @@ while(True):
             updt(inp)
         elif(inp[0:4] == "copy"):
             cpy(inp)
+        elif(inp == "reset"):
+            reset()
         elif(inp == "exit"):
             print("Bye !!")
             exit()
@@ -387,3 +411,4 @@ while(True):
     except (KeyboardInterrupt):
         print("\nBye !!")
         exit()
+##----------------------------------------------EOF-----------------------------------------------##
