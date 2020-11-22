@@ -1,92 +1,62 @@
-# Stdio Mask
-# By Al Sweigart al@inventwithpython.com
-
-__version__ = '0.0.6'  # type: str
-
+#actual code was from the library stdiomask.
+#this was edited just to meet the needs of the main.py
+__version__ = '0.0.6'
 import sys
-
-
-"""Notes about making this code backwards-compatible with Python 2:
-sys.stdout.write() can only write unicode strings, not Python 2 str strings.
-I create STR_TYPE to use for isinstance() checks. Also, the u prefix for
-unicode strings causes syntax errors on Python 3.1 and 3.2, so instead I
-pass those strings to STR_TYPE, which is set to unicode() on Python 2,
-which effectively does the same thing as the u prefix.
-"""
-STR_TYPE = str # type: type
-RUNNING_PYTHON_2 = sys.version_info[0] == 2  # type: bool
+STR_TYPE = str
+RUNNING_PYTHON_2 = sys.version_info[0] == 2
 if RUNNING_PYTHON_2:
-    STR_TYPE = unicode # Ignore the pyflakes warning on this line.
-
-
+    STR_TYPE = unicode
 try:
     from typing import List
 except ImportError:
-    pass # There is no typing module on Python 2, but that's fine because we use the comment-style of type hints.
-
+    pass
 if sys.platform == 'win32':
-    # For some reason, mypy reports that msvcrt doesn't have getch, ignore this warning:
-    from msvcrt import getch # type: ignore
-
+    from msvcrt import getch
     def getpass(prompt='Password: ', mask='*'):
-        # type: (str, str) -> str
-
         if RUNNING_PYTHON_2:
-            # On Python 2, convert `prompt` and `mask` from str to unicode because sys.stdout.write requires unicode.
             if isinstance(prompt, str):
-                # Mypy in Python 3 mode (the default mode) will complain about the following line:
-                prompt = prompt.decode('utf-8') # type: ignore
+                prompt = prompt.decode('utf-8')
             if isinstance(mask, str):
-                # Mypy in Python 3 mode (the default mode) will complain about the following line:
-                mask = mask.decode('utf-8') # type: ignore
-
+                mask = mask.decode('utf-8')
         if not isinstance(prompt, STR_TYPE):
             raise TypeError('prompt argument must be a str, not %s' % (type(prompt).__name__))
         if not isinstance(mask, STR_TYPE):
             raise TypeError('mask argument must be a zero- or one-character str, not %s' % (type(prompt).__name__))
         if len(mask) > 1:
             raise ValueError('mask argument must be a zero- or one-character str')
-
         if mask == '' or sys.stdin is not sys.__stdin__:
-            # Fall back on getpass if a mask is not needed.
             import getpass as gp
             return gp.getpass(prompt)
-
-        enteredPassword = [] # type: List[str]
+        enteredPassword = []
         sys.stdout.write(prompt)
         sys.stdout.flush()
         while True:
             key = ord(getch())
-            if key == 13: # Enter key pressed.
+            if key == 13:
                 if RUNNING_PYTHON_2:
                     sys.stdout.write(STR_TYPE('\n'))
                 else:
                     sys.stdout.write('\n')
                 return ''.join(enteredPassword)
-            elif key in (8, 127): # Backspace/Del key erases previous output.
+            elif key in (8, 127):
                 if len(enteredPassword) > 0:
-                    # Erases previous character.
                     if RUNNING_PYTHON_2:
-                        sys.stdout.write(STR_TYPE('\b \b')) # \b doesn't erase the character, it just moves the cursor back.
+                        sys.stdout.write(STR_TYPE('\b \b'))
                     else:
-                        sys.stdout.write('\b \b') # \b doesn't erase the character, it just moves the cursor back.
+                        sys.stdout.write('\b \b')
                     sys.stdout.flush()
                     enteredPassword = enteredPassword[:-1]
             elif 0 <= key <= 31:
-                # Do nothing for unprintable characters.
-                # TODO: Handle Esc, F1-F12, arrow keys, home, end, insert, del, pgup, pgdn
                 pass
             else:
-                # Key is part of the password; display the mask character.
                 char = chr(key)
                 sys.stdout.write(mask)
                 sys.stdout.flush()
                 enteredPassword.append(char)
 
-else: # macOS and Linux
+else:
     import tty, termios
     def getch():
-        # type: () -> str
         fd = sys.stdin.fileno()
         old_settings = termios.tcgetattr(fd)
         try:
@@ -97,17 +67,11 @@ else: # macOS and Linux
         return ch
 
     def getpass(prompt='Password: ', mask='*'):
-        # type: (str, str) -> str
-
         if RUNNING_PYTHON_2:
-            # On Python 2, convert `prompt` and `mask` from str to unicode because sys.stdout.write requires unicode.
             if isinstance(prompt, str):
-                # Mypy in Python 3 mode (the default mode) will complain about the following line:
-                prompt = prompt.decode('utf-8') # type: ignore
+                prompt = prompt.decode('utf-8')
             if isinstance(mask, str):
-                # Mypy in Python 3 mode (the default mode) will complain about the following line:
-                mask = mask.decode('utf-8') # type: ignore
-
+                mask = mask.decode('utf-8')
         if not isinstance(prompt, STR_TYPE):
             raise TypeError('prompt argument must be a str, not %s' % (type(prompt).__name__))
         if not isinstance(mask, STR_TYPE):
@@ -116,16 +80,14 @@ else: # macOS and Linux
             raise ValueError('mask argument must be a zero- or one-character str')
 
         if mask == '' or sys.stdin is not sys.__stdin__:
-            # Fall back on getpass if a mask is not needed.
             import getpass as gp
             return gp.getpass(prompt)
-
-        enteredPassword = [] # List[str]
+        enteredPassword = []
         sys.stdout.write(prompt)
         sys.stdout.flush()
         while True:
             key = ord(getch())
-            if key == 13: # Enter key pressed.
+            if key == 13:
                 if RUNNING_PYTHON_2:
                     sys.stdout.write(STR_TYPE('\n'))
                 else:
@@ -134,21 +96,17 @@ else: # macOS and Linux
             elif (key == 3):
                 raise KeyboardInterrupt
 
-            elif key in (8, 127): # Backspace/Del key erases previous output.
+            elif key in (8, 127):
                 if len(enteredPassword) > 0:
-                    # Erases previous character.
                     if RUNNING_PYTHON_2:
-                        sys.stdout.write(STR_TYPE('\b \b')) # \b doesn't erase the character, it just moves the cursor back.
+                        sys.stdout.write(STR_TYPE('\b \b'))
                     else:
-                        sys.stdout.write('\b \b') # \b doesn't erase the character, it just moves the cursor back.
+                        sys.stdout.write('\b \b')
                     sys.stdout.flush()
                     enteredPassword = enteredPassword[:-1]
             elif 0 <= key <= 31:
-                # Do nothing for unprintable characters.
-                # TODO: Handle Esc, F1-F12, arrow keys, home, end, insert, del, pgup, pgdn
                 pass
             else:
-                # Key is part of the password; display the mask character.
                 char = chr(key)
                 sys.stdout.write(mask)
                 sys.stdout.flush()
