@@ -290,7 +290,7 @@ def cpy(txt):
         elif(tocopy == 'pswd'):
             cp = pswd
         copy(cp)
-        print(tocopy+" copied to clip board")
+        print(tocopy+" copied to clipboard")
     else:
         print("No data found regarding Entry ID "+id+". Try using see command to check for available Entry ID's.")
 startup()
