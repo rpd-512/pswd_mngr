@@ -15,7 +15,7 @@ def startup():
         dbPath = ""
     else:
         clrScr = "clear"
-        dbPath = os. path. expanduser("~")+"/.pswd_mngr/"
+        dbPath = os.path.expanduser("~")+"/.pswd_mngr/"
     if(os.path.exists(dbPath+".pswds.db")):
         conn = sqlite3.connect(dbPath+".pswds.db")
         datab = conn.execute('select * from app_det;')
@@ -261,7 +261,7 @@ def updt(txt):
     if(updt_pswd == ""):
         updt_pswd = pswd
     
-    conn.execute("update pwd_det set site='"+updt_stnm+"',mail='"+updt_mlid+"',uname='"+updt_usnm+"',pswd='"+encr(updt_pswd)+"'")
+    conn.execute("update pwd_det set site='"+updt_stnm+"',mail='"+updt_mlid+"',uname='"+updt_usnm+"',pswd='"+encr(updt_pswd)+"' where siteId = "+id)
     conn.commit()
     print("\nData updated")
 def cpy(txt):
@@ -307,10 +307,6 @@ def reset():
         print("!! Wrong password !!")
         return 0
     os.remove(dbPath+'.pswds.db')
-    try:
-        os.rmdir(dbPath)
-    except:
-        pass
     print("!!DELETED!!")
     sleep(3)
     os.system("clear")
