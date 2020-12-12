@@ -360,8 +360,7 @@ while(True):
             Github : https://github.com/rpd-512/
             Twitter: https://twitter.com/RhiddhiD
             Fiverr : https://www.fiverr.com/rpd_512
-            Email  : rhiddhiprasad@gmail.com
-            """)
+            Email  : rhiddhiprasad@gmail.com\n""")
         elif(inp == "cmp"):
             cmp()
         elif(inp == "clear"):
