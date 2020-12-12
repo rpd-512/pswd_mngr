@@ -48,7 +48,10 @@ def startup():
                 sleep(3)
                 exit()
             if(mst_pswd == rem_pswd):
-                os.mkdir(dbPath)
+                try:
+                    os.mkdir(dbPath)
+                except:
+                    pass
                 conn = sqlite3.connect(dbPath+".pswds.db")
                 conn.execute("create table app_det (pswd text);")
                 conn.execute("""create table pwd_det (
