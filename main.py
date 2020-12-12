@@ -26,10 +26,12 @@ def startup():
                 pswd = hidepass.getpass(prompt="Enter master password: ")
             except (KeyboardInterrupt):
                 print("\n!!Cancelled!!")
+                sleep(3)
                 exit()
             hash_pswd = (hashlib.md5((pswd+"314159265358979323846264338327").encode())).hexdigest()
             if(hash_pswd != acc_pswd):
                 print("!! Wrong password !!")
+                sleep(3)
                 exit()
             else:
                 os.system(clrScr)
@@ -43,6 +45,7 @@ def startup():
                 rem_pswd = hidepass.getpass(prompt="Please re-enter your master password: ")
             except(KeyboardInterrupt):
                 print("\n!!Cancelled!!")
+                sleep(3)
                 exit()
             if(mst_pswd == rem_pswd):
                 os.mkdir(dbPath)
@@ -319,8 +322,7 @@ except:
 conn = sqlite3.connect(dbPath+".pswds.db")
 while(True):
     try:
-        inp = input("password_manager:~$ ")
-        inp = inp.lower()
+        inp = input("password_manager:~$ ").lower()
         if(inp == "\\h" or "help" in inp):
             print("""\n|HELP|
             -> cmp   - change master password
@@ -350,7 +352,13 @@ while(True):
             -> \\h    - help
             -> \\a    - about\n""")
         elif(inp == "\\a"):
-            print("about us")
+            print("""\n|ABOUT|
+            This is a CLI, python based password manager created by Rhiddhi Prasad Das.
+            Github : https://github.com/rpd-512/
+            Twitter: https://twitter.com/RhiddhiD
+            Fiverr : https://www.fiverr.com/rpd_512
+            Email  : rhiddhiprasad@gmail.com
+            """)
         elif(inp == "cmp"):
             cmp()
         elif(inp == "clear"):
@@ -399,6 +407,7 @@ while(True):
             reset()
         elif(inp == "exit"):
             print("Bye !!")
+            sleep(3)
             exit()
         elif(inp.replace(" ","") == ""):
             pass
@@ -406,5 +415,6 @@ while(True):
             print("Invalid input")
     except (KeyboardInterrupt):
         print("\nBye !!")
+        sleep(3)
         exit()
 ##----------------------------------------------EOF-----------------------------------------------##
